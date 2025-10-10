@@ -8,17 +8,25 @@ import com.badlogic.gdx.utils.ScreenUtils;
 
 public class GameScreen extends AbstractScreen {
     private SpriteBatch batch;
+    private Player player;
 
     @Override
     public void show() {
         batch = new SpriteBatch();
+        player=new Player("Red_Socccer_Ball.png",100,100);
     }
 
     @Override
-    public void render(float v) {
+    public void render(float delta) {
+        player.Update(delta);
         ScreenUtils.clear(Color.GREEN);
         batch.begin();
-        // RenderSachen
+        player.render(batch);
         batch.end();
+    }
+    @Override
+    public void dispose() {
+        batch.dispose();
+        player.dispose();
     }
 }

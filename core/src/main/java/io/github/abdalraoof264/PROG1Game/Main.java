@@ -10,8 +10,21 @@ import com.badlogic.gdx.utils.ScreenUtils;
  * {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms.
  */
 public class Main extends Game {
+    private GameScreen gameScreen;
+    private MenuScreen menuScreen;
+
     @Override
     public void create() {
-        setScreen(new MenuScreen());
+        setScreen(new GameScreen());
     }
+    public void switchScreen(String screenName) {
+        switch (screenName) {
+            case "MENU":
+                setScreen(menuScreen);
+                break;
+            case "GAME":
+                setScreen(gameScreen);
+                break;
+        }
+}
 }

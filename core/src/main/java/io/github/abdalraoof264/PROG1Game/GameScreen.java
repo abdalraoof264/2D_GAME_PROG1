@@ -1,5 +1,6 @@
 package io.github.abdalraoof264.PROG1Game;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -9,11 +10,15 @@ import com.badlogic.gdx.utils.ScreenUtils;
 public class GameScreen extends AbstractScreen {
     private SpriteBatch batch;
     private Player player;
+    private Tastatur tastatur;
 
     @Override
     public void show() {
         batch = new SpriteBatch();
-        player=new Player("Red_Socccer_Ball.png",100,100);
+        tastatur = new Tastatur();
+        Gdx.input.setInputProcessor(tastatur);
+
+        player=new Player("35-359224_can-you-name-the-video-game-by-just-a-few-pixels-mario.jpg",10,10,tastatur);
     }
 
     @Override

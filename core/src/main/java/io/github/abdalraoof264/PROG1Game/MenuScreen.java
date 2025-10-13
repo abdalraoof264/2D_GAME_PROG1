@@ -14,6 +14,15 @@ public class MenuScreen extends AbstractScreen {
     }
 
     @Override
+    public void resume(){
+
+    }
+
+    @Override
+    public void pause(){
+    }
+
+    @Override
     public void render(float v) {
         ScreenUtils.clear(Color.RED);
         batch.begin();

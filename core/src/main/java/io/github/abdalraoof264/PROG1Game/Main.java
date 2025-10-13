@@ -15,16 +15,6 @@ public class Main extends Game {
 
     @Override
     public void create() {
-        setScreen(new GameScreen());
+        setScreen(new MenuScreen(this));
     }
-    public void switchScreen(String screenName) {
-        switch (screenName) {
-            case "MENU":
-                setScreen(menuScreen);
-                break;
-            case "GAME":
-                setScreen(gameScreen);
-                break;
-        }
-}
 }

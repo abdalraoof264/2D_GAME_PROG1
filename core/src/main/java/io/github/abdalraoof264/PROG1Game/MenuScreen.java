@@ -1,5 +1,7 @@
 package io.github.abdalraoof264.PROG1Game;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -7,6 +9,10 @@ import com.badlogic.gdx.utils.ScreenUtils;
 
 public class MenuScreen extends AbstractScreen {
     private SpriteBatch batch;
+    private Main main;
+    public  MenuScreen(Main main) {
+        this.main = main;
+    }
 
     @Override
     public void show() {
@@ -26,7 +32,9 @@ public class MenuScreen extends AbstractScreen {
     public void render(float v) {
         ScreenUtils.clear(Color.RED);
         batch.begin();
-        // RenderSachen
+        if(Gdx.input.isKeyPressed(Input.Keys.ENTER)){
+            main.setScreen(new GameScreen(main));
+        }
         batch.end();
     }
 }

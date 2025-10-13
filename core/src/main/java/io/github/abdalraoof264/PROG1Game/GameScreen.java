@@ -1,6 +1,7 @@
 package io.github.abdalraoof264.PROG1Game;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -11,6 +12,10 @@ public class GameScreen extends AbstractScreen {
     private SpriteBatch batch;
     private Player player;
     private Tastatur tastatur;
+    private Main main;
+    public GameScreen(Main main) {
+        this.main = main;
+    }
 
     @Override
     public void show() {
@@ -27,6 +32,9 @@ public class GameScreen extends AbstractScreen {
         ScreenUtils.clear(Color.GREEN);
         batch.begin();
         player.render(batch);
+        if(Gdx.input.isKeyPressed(Input.Keys.ESCAPE)){
+            main.setScreen(new MenuScreen(main));
+        }
         batch.end();
     }
     @Override

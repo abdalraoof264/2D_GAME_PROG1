@@ -13,6 +13,7 @@ public class Tastatur implements InputProcessor {
         if (keycode == Input.Keys.DOWN)  down = true;
         if (keycode == Input.Keys.LEFT)  left = true;
         if (keycode == Input.Keys.RIGHT) right = true;
+        // if (keycode == Input.Keys.ENTER)  return true;
         return true;
     }
 

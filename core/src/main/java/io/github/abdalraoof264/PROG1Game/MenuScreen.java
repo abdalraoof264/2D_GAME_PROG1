@@ -28,11 +28,11 @@ public class MenuScreen extends AbstractScreen {
     @Override
     public void show() {
         batch = new SpriteBatch();
-        background = new Texture("menu_background.png"); // dein Hintergrundbild im assets-Ordner
+        background = new Texture("menu_background.png");
 
-        titleFont = new BitmapFont(); // Standardfont
+        titleFont = new BitmapFont();
         titleFont.setColor(Color.WHITE);
-        titleFont.getData().setScale(3f); // größerer Text für Titel
+        titleFont.getData().setScale(3f);
 
         infoFont = new BitmapFont();
         infoFont.setColor(Color.YELLOW);

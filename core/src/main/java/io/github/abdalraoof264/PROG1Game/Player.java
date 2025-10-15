@@ -24,6 +24,20 @@ public class Player {
         if (Gdx.input.isKeyPressed(Input.Keys.DOWN))  y -= speed * delta;
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT))  x -= speed * delta;
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) x += speed * delta;
+
+        if (x < 0){
+            x = 0;
+        }
+
+        if (y < 0){
+            y = 0;
+        }
+
+        if (y > texture.getHeight()){
+            y = texture.getHeight();
+        }
+
+
     }
 
     public void render(SpriteBatch batch) {

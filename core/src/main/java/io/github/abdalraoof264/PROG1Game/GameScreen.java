@@ -23,7 +23,7 @@ public class GameScreen extends AbstractScreen {
         tastatur = new Tastatur();
         Gdx.input.setInputProcessor(tastatur);
 
-        player=new Player("35-359224_can-you-name-the-video-game-by-just-a-few-pixels-mario.jpg",10,10,tastatur);
+        player=new Player("mario.jpg",10,10,tastatur);
     }
 
     @Override

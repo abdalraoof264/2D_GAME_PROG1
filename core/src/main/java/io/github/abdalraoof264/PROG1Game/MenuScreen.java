@@ -16,10 +16,12 @@ public class MenuScreen extends AbstractScreen {
     private BitmapFont titleFont;
     private BitmapFont infoFont;
     private boolean showResume;
+
     public  MenuScreen(Main main) {
         this.main = main;
         this.showResume = true;
     }
+
     public MenuScreen(Main main, boolean showResume) {
         this.main = main;
         this.showResume = showResume;

@@ -4,10 +4,13 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class MenuScreen extends AbstractScreen {
     private SpriteBatch batch;
@@ -17,7 +20,11 @@ public class MenuScreen extends AbstractScreen {
     private BitmapFont infoFont;
     private boolean showResume;
 
-    public  MenuScreen(Main main) {
+    // Wichtig für das Skalieren des Hintergrunds
+    private OrthographicCamera camera;
+    private Viewport viewport;
+
+    public MenuScreen(Main main) {
         this.main = main;
         this.showResume = true;
     }
@@ -30,7 +37,7 @@ public class MenuScreen extends AbstractScreen {
     @Override
     public void show() {
         batch = new SpriteBatch();
-        background = new Texture("menu_background.png");
+        background = new Texture("background.png");
 
         titleFont = new BitmapFont();
         titleFont.setColor(Color.WHITE);
@@ -39,7 +46,20 @@ public class MenuScreen extends AbstractScreen {
         infoFont = new BitmapFont();
         infoFont.setColor(Color.YELLOW);
         infoFont.getData().setScale(1.5f);
+
+        // Für das die Skalierung
+        camera = new OrthographicCamera();
+        viewport = new FitViewport(800, 600, camera);
+        viewport.apply();
+        camera.position.set(camera.viewportWidth / 2, camera.viewportHeight / 2, 0);
     }
+
+    @Override
+    public void resize(int width, int height){
+        viewport.update(width, height, true);
+    }
+
+
 
     @Override
     public void resume(){
@@ -52,34 +72,52 @@ public class MenuScreen extends AbstractScreen {
 
     @Override
     public void render(float v) {
-        ScreenUtils.clear(Color.RED);
-        batch.begin();
-        batch.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-        // Titeltext
+        camera.update();
+        batch.setProjectionMatrix(camera.combined);
+
+        ScreenUtils.clear(Color.BLACK);
+        batch.begin();
+
+        // Brauchen wir alles für die Skalierung
+        float worldWidth = viewport.getWorldWidth();
+        float worldHeight = viewport.getWorldHeight();
+
+        float imgWidth = background.getWidth();
+        float imgHeight = background.getHeight();
+
+        float scale = Math.max(worldWidth / imgWidth, worldHeight / imgHeight);
+        float newWidth = imgWidth * scale;
+        float newHeight = imgHeight * scale;
+
+        float x = camera.position.x - (newWidth / 2);
+        float y = camera.position.y - (newHeight / 2);
+
+        batch.draw(background, x, y, newWidth, newHeight);
+
+
         titleFont.draw(batch, "MENU",
-            Gdx.graphics.getWidth() / 2f - 250,
-            Gdx.graphics.getHeight() / 2f + 100);
+            viewport.getWorldWidth() / 2f -75,
+            viewport.getWorldHeight() / 2f + 150);
 
         if (showResume) {
             infoFont.draw(batch, "Press R to Resume",
-                Gdx.graphics.getWidth() / 2f - 130,
-                Gdx.graphics.getHeight() / 2f + 20);
+                viewport.getWorldHeight() / 2f - 0,
+                viewport.getWorldWidth() / 2f -50);
         }
 
-        // Anweisungen
         infoFont.draw(batch, "Press ENTER to Start",
-            Gdx.graphics.getWidth() / 2f - 150,
-            Gdx.graphics.getHeight() / 2f - 50);
+            viewport.getWorldHeight() / 2f - 0,
+            viewport.getWorldWidth() / 2f -100);
 
         infoFont.draw(batch, "Press ESC to Exit",
-            Gdx.graphics.getWidth() / 2f - 130,
-            Gdx.graphics.getHeight() / 2f - 100);
+            viewport.getWorldHeight() / 2f - 0,
+            viewport.getWorldWidth() / 2f -150);
         batch.end();
-        if(Gdx.input.isKeyPressed(Input.Keys.ENTER)){
+        if(Gdx.input.isKeyJustPressed(Input.Keys.ENTER)){
             main.setScreen(new GameScreen(main));
         }
-        if (showResume && Gdx.input.isKeyPressed(Input.Keys.R)) {
+        if (showResume && Gdx.input.isKeyJustPressed(Input.Keys.R)) {
             main.setScreen(new GameScreen(main));
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {

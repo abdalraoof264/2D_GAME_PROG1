@@ -21,6 +21,11 @@ public class GameScreen extends AbstractScreen {
     private Texture gameBackground;
     private BitmapFont scoreFont;
     private int score = 0;
+    private int health = 3;
+    private BitmapFont HealthbarFont;
+    private final int maxHealth = 3;
+    private float iFrames = 0f;
+
 
     // Für Kollisionen
     private Rectangle playerRectangle = new Rectangle(70, 183, 65, 65);
@@ -36,6 +41,10 @@ public class GameScreen extends AbstractScreen {
 
     // Für die Score leiste damit die es im Bild bleibt
     private OrthographicCamera cameraScore;
+
+
+    //***************************************//
+    private com.badlogic.gdx.graphics.glutils.ShapeRenderer shapes;
 
     public GameScreen(Main main) {
         this.main = main;
@@ -53,10 +62,19 @@ public class GameScreen extends AbstractScreen {
         scoreFont.setColor(Color.WHITE);
         scoreFont.getData().setScale(2f);
 
+        //***************************************//
+        HealthbarFont = new BitmapFont();
+        HealthbarFont.getData().setScale(2f);
+        HealthbarFont.setColor(Color.RED);
+        shapes = new com.badlogic.gdx.graphics.glutils.ShapeRenderer();
+        //***************************************//
+
         gameBackground = new Texture("gameBackground.png");
         player=new Player("player.png",70,183, tastatur);
         // Hier kann man Gegner hinzufügen
         enemies.add(new Enemy("enemy1.png", 400, 168, 95, 95));
+        enemies.add(new Enemy("enemy1.png", 600, 168, 95, 95));
+
         // Hier kann man Items hinzufügen
         items.add(new Item("Muenzen.png", 500, 370));
         items.add(new Item("Muenzen.png", 1000, 200));
@@ -73,6 +91,8 @@ public class GameScreen extends AbstractScreen {
         // Für die Score leiste
         cameraScore = new OrthographicCamera();
         cameraScore.setToOrtho(false, 800, 600);
+
+
     }
 
     @Override
@@ -116,7 +136,7 @@ public class GameScreen extends AbstractScreen {
 
         for (int i = 0; i < enemies.size(); i++ ) {
             Enemy enemy = enemies.get(i);
-
+            enemy.update(delta);
             enemy.render(batch);
 
             enemyRectangle.x = enemy.getX();
@@ -130,9 +150,22 @@ public class GameScreen extends AbstractScreen {
                 continue;
             }
 
-            if(playerRectangle.overlaps(enemyRectangle) && player.getY() <= (enemy.getY() + enemyRectangle.height * 0.9)) {
-                main.setScreen(new GameOverScreen(main));
+            if (playerRectangle.overlaps(enemyRectangle)
+                && player.getY() <= (enemy.getY() + enemyRectangle.height * 0.9)) {
+
+                if (iFrames <= 0f) {
+                    health -= 1;               // damage amount
+                    iFrames = 1.0f;             // 1 second invulnerability
+
+                    player.setVelocityY(8f);    // small knockback
+                    player.setIsJumping(true);
+                }
+                if (health <= 0) {
+                    main.setScreen(new GameOverScreen(main));
+                    return;
+                }
             }
+
         }
 
         Rectangle itemRectangle = new Rectangle(0, 0, 70, 70);
@@ -169,10 +202,31 @@ public class GameScreen extends AbstractScreen {
 
         batch.end();
 
+        // --- HUD: Score text ---
         batch.setProjectionMatrix(cameraScore.combined);
         batch.begin();
-        scoreFont.draw(batch, "SCORE: " + score, 70, 590);
+        scoreFont.draw(batch, "SCORE: " + score, 20, 580);
+        HealthbarFont.draw(batch, "HP:", 20, 545);
         batch.end();
+
+// --- HUD: Health bar ---
+        shapes.setProjectionMatrix(cameraScore.combined);
+        shapes.begin(com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.Filled);
+
+// bar background
+        float barX = 80, barY = 530, barW = 220, barH = 22;
+        shapes.setColor(Color.DARK_GRAY);
+        shapes.rect(barX, barY, barW, barH);
+
+// bar fill
+        float pct = Math.max(0f, Math.min(1f, health / (float) maxHealth));
+        shapes.setColor(Color.RED);
+        shapes.rect(barX, barY, barW * pct, barH);
+
+        shapes.end();
+
+
+
 
         if(Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)){
             dispose();
@@ -187,8 +241,7 @@ public class GameScreen extends AbstractScreen {
     }
 
     @Override
-    public void dispose() {
-        batch.dispose();
-        player.dispose();
+    public void dispose() { batch.dispose(); player.dispose();
     }
+
 }

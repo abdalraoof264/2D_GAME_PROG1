@@ -6,11 +6,13 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class Player {
-    private final Texture texture;
+
+    private Main main;
+
     private float x, y;
-    private final float speed = 275f;
-    private final float width;
-    private final float height;
+    private final float speed = 300f;
+    private float width;
+    private float height;
 
     //Für die Sprung physik
     private boolean isJumping = false;
@@ -18,12 +20,29 @@ public class Player {
     private float jumpVelocity = 14f;
     private float velocityY = 0f;
 
-    public Player(String texturePath, float startX, float startY, Tastatur tastatur) {
-        texture = new Texture(texturePath);
+    // Für die Sprites
+    private Texture playerPngAktuell;
+    private  Texture playerPng;
+    private  Texture playerLookingUpPng;
+    private  Texture playerLookingDownPng;
+
+    public Player(String player1, float startX, float startY, Tastatur tastatur) {
+        playerPng = new Texture(player1);
+        playerLookingUpPng = new Texture("playerLookingUp.png");
+        playerPngAktuell = playerPng;
+        playerLookingDownPng = new Texture("playerLookingDown.png");
         x = startX;
         y = startY;
-        width = 65;
-        height = 65;
+        width = 100;
+        height = 100;
+    }
+
+    public void setX(float x) {
+        this.x = x;
+    }
+
+    public void setY(float y) {
+        this.y = y;
     }
 
     public float getX() {
@@ -33,11 +52,37 @@ public class Player {
         return y;
     }
 
+    public void setVelocityY(float y) {
+        this.velocityY = y;
+    }
+
+    public float getVelocityY() {
+        return velocityY;
+    }
+
+    public void setIsJumping(boolean isJumping) {
+        this.isJumping = isJumping;
+    }
+
     public void Update(float delta) {
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT))  x -= speed * delta;
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) x += speed * delta;
 
-        if(!isJumping && (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) || Gdx.input.isKeyJustPressed(Input.Keys.UP ))){
+        if(Gdx.input.isKeyPressed(Input.Keys.UP)){
+            playerPngAktuell = playerLookingUpPng;
+        }
+
+        else if(Gdx.input.isKeyPressed(Input.Keys.DOWN)){
+            playerPngAktuell = playerLookingDownPng;
+            height = 50;
+        }
+
+        else{
+            playerPngAktuell = playerPng;
+            height = 100;
+        }
+
+        if(!isJumping && (Gdx.input.isKeyJustPressed(Input.Keys.SPACE))){
             isJumping = true;
             velocityY = velocityY + jumpVelocity;
         }
@@ -57,21 +102,19 @@ public class Player {
             isJumping = false;
         }
 
-        if (y > texture.getHeight()){
-            y = texture.getHeight();
-        }
+      //  if (y > texture.getHeight()){
+      //      y = texture.getHeight();
+      //  }
 
 
     }
 
     public void render(SpriteBatch batch) {
-
-        batch.draw(texture, x, y, width, height);
-
+        batch.draw(playerPngAktuell, x, y, width, height);
     }
 
     public void dispose() {
-        texture.dispose();
+        playerPng.dispose();
     }
 }
 

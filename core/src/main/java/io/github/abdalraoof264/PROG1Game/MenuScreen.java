@@ -29,11 +29,6 @@ public class MenuScreen extends AbstractScreen {
         this.showResume = true;
     }
 
-    public MenuScreen(Main main, boolean showResume) {
-        this.main = main;
-        this.showResume = showResume;
-    }
-
     @Override
     public void show() {
         batch = new SpriteBatch();
@@ -57,17 +52,6 @@ public class MenuScreen extends AbstractScreen {
     @Override
     public void resize(int width, int height){
         viewport.update(width, height, true);
-    }
-
-
-
-    @Override
-    public void resume(){
-
-    }
-
-    @Override
-    public void pause(){
     }
 
     @Override
@@ -113,18 +97,32 @@ public class MenuScreen extends AbstractScreen {
         infoFont.draw(batch, "Press ESC to Exit",
             viewport.getWorldHeight() / 2f - 0,
             viewport.getWorldWidth() / 2f -150);
+
         batch.end();
+
         if(Gdx.input.isKeyJustPressed(Input.Keys.ENTER)){
             main.setScreen(new GameScreen(main));
         }
+
         if (showResume && Gdx.input.isKeyJustPressed(Input.Keys.R)) {
             main.setScreen(new GameScreen(main));
         }
+
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
             Gdx.app.exit(); // Spiel beenden
         }
 
     }
+
+    @Override
+    public void resume(){
+
+    }
+
+    @Override
+    public void pause(){
+    }
+
     @Override
     public void dispose() {
         batch.dispose();

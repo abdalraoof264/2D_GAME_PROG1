@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 public class Main extends Game {
     private GameScreen gameScreen;
     private MenuScreen menuScreen;
+    private GameOverScreen gameOverScreen;
 
     @Override
     public void create() {

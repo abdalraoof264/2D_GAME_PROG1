@@ -75,7 +75,7 @@ public class GameScreen extends AbstractScreen {
 
         // Hier kann man Gegner hinzufügen
         enemies.add(new Enemy("enemy1.png", 400, 168, 95, 95));
-        enemies.add(new Enemy("enemy1.png", 600, 168, 95, 95));
+        enemies.add(new Enemy("enemy1.png", 500, 320, 95, 95));
 
         // Hier kann man Items hinzufügen
         items.add(new Item("Muenzen.png", 500, 370));

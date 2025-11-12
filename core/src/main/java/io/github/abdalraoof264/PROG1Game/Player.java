@@ -17,14 +17,14 @@ public class Player {
     //Für die Sprung physik
     private boolean isJumping = false;
     private float gravity = -0.5f;
-      private float jumpVelocity = 14f;
+    private float jumpVelocity = 14f;
     private float velocityY = 0f;
 
     // Für die Sprites
     private Texture playerPngAktuell;
-    private  Texture playerPng;
-    private  Texture playerLookingUpPng;
-    private  Texture playerLookingDownPng;
+    private Texture playerPng;
+    private Texture playerLookingUpPng;
+    private Texture playerLookingDownPng;
     private Texture playerLeftPng;
 
 
@@ -109,7 +109,7 @@ public class Player {
         }
 
         if (x < 0) x = 0;
-        if (y < 183) { y = 183; velocityY = 0; isJumping = false; }
+        if (y < 100) { y = 105; velocityY = 0; isJumping = false; }
     }
 
 

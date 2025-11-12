@@ -71,18 +71,18 @@ public class GameScreen extends AbstractScreen {
 
 
         gameBackground = new Texture("gameBackground.png");
-        player=new Player("player.png",70,183, tastatur);
+        player=new Player("player.png",70,105, tastatur);
 
         // Hier kann man Gegner hinzufügen
-        enemies.add(new Enemy("enemy1.png", 400, 168, 95, 95));
-        enemies.add(new Enemy("enemy1.png", 500, 320, 95, 95));
+        enemies.add(new Enemy("enemy1.png", 400, 100, 95, 95));
+        enemies.add(new Enemy("enemy1.png", 600, 100, 95, 95));
 
         // Hier kann man Items hinzufügen
-        items.add(new Item("Muenzen.png", 500, 370));
+        items.add(new Item("Muenzen.png", 500, 300));
         items.add(new Item("Muenzen.png", 1000, 200));
 
         //Hier kann man Blöcke hinzufügen
-        blocks.add(new Block("Block.png", 500, 270));
+        blocks.add(new Block("Block.png", 500, 200));
 
         // Für das die Skalierung
         camera = new OrthographicCamera();
@@ -99,13 +99,6 @@ public class GameScreen extends AbstractScreen {
 
     @Override
     public void render(float delta) {
-
-        //***********************//
-        if (iFrames > 0f) {
-            iFrames -= delta;                // delta = letzte zeit punkt ab dem letzten frame behalten
-            if (iFrames < 0f) iFrames = 0f;  // Hier wird iFrames um delta reduziert, damit der Timer richtig abläuft.
-        }
-        //**************************//
 
         player.Update(delta);
 
@@ -145,7 +138,7 @@ public class GameScreen extends AbstractScreen {
 
         player.render(batch);
 
-        Rectangle enemyRectangle = new Rectangle(0, 0, 95, 95);
+        Rectangle enemyRectangle = new Rectangle(0, 0, 95, 108);
 
         for (int i = 0; i < enemies.size(); i++ ) {
             Enemy enemy = enemies.get(i);
@@ -155,16 +148,16 @@ public class GameScreen extends AbstractScreen {
             enemyRectangle.x = enemy.getX();
             enemyRectangle.y = enemy.getY();
 
+
             if(playerRectangle.overlaps(enemyRectangle) && player.getY() > (enemy.getY() + enemyRectangle.height * 0.9)){
                 enemies.remove(enemy);
                 player.setVelocityY(10f);
                 player.setIsJumping(true);
-                i--;
                 continue;
             }
 
             if (playerRectangle.overlaps(enemyRectangle)
-                && player.getY() <= (enemy.getY() + enemyRectangle.height * 0.9)) {
+                && player.getY() < (enemy.getY() + enemyRectangle.height * 0.9)) {
 
                 if (iFrames <= 0f) {
                     health -= 1;

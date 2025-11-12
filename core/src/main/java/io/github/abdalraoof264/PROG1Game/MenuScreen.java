@@ -16,9 +16,6 @@ public class MenuScreen extends AbstractScreen {
     private SpriteBatch batch;
     private Main main;
     private Texture background;
-    private BitmapFont titleFont;
-    private BitmapFont infoFont;
-    private boolean showResume;
 
     // Wichtig für das Skalieren des Hintergrunds
     private OrthographicCamera camera;
@@ -26,21 +23,12 @@ public class MenuScreen extends AbstractScreen {
 
     public MenuScreen(Main main) {
         this.main = main;
-        this.showResume = true;
     }
 
     @Override
     public void show() {
         batch = new SpriteBatch();
         background = new Texture("background.png");
-
-        titleFont = new BitmapFont();
-        titleFont.setColor(Color.WHITE);
-        titleFont.getData().setScale(3f);
-
-        infoFont = new BitmapFont();
-        infoFont.setColor(Color.YELLOW);
-        infoFont.getData().setScale(1.5f);
 
         // Für das die Skalierung
         camera = new OrthographicCamera();
@@ -79,32 +67,9 @@ public class MenuScreen extends AbstractScreen {
 
         batch.draw(background, x, y, newWidth, newHeight);
 
-
-        titleFont.draw(batch, "MENU",
-            viewport.getWorldWidth() / 2f -75,
-            viewport.getWorldHeight() / 2f + 150);
-
-        if (showResume) {
-            infoFont.draw(batch, "Press R to Resume",
-                viewport.getWorldHeight() / 2f - 0,
-                viewport.getWorldWidth() / 2f -50);
-        }
-
-        infoFont.draw(batch, "Press ENTER to Start",
-            viewport.getWorldHeight() / 2f - 0,
-            viewport.getWorldWidth() / 2f -100);
-
-        infoFont.draw(batch, "Press ESC to Exit",
-            viewport.getWorldHeight() / 2f - 0,
-            viewport.getWorldWidth() / 2f -150);
-
         batch.end();
 
         if(Gdx.input.isKeyJustPressed(Input.Keys.ENTER)){
-            main.setScreen(new GameScreen(main));
-        }
-
-        if (showResume && Gdx.input.isKeyJustPressed(Input.Keys.R)) {
             main.setScreen(new GameScreen(main));
         }
 
@@ -127,7 +92,5 @@ public class MenuScreen extends AbstractScreen {
     public void dispose() {
         batch.dispose();
         background.dispose();
-        titleFont.dispose();
-        infoFont.dispose();
     }
 }

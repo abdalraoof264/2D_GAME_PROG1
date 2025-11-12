@@ -168,7 +168,7 @@ public class GameScreen extends AbstractScreen {
 
                 if (iFrames <= 0f) {
                     health -= 1;
-                    iFrames = 1.0f;
+                    iFrames = 2.0f;
 
                     player.setVelocityY(8f);
                     player.setIsJumping(true);

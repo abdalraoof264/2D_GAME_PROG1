@@ -98,6 +98,13 @@ public class GameScreen extends AbstractScreen {
     @Override
     public void render(float delta) {
 
+        //***********************//
+        if (iFrames > 0f) {
+            iFrames -= delta;                // delta = letzte zeit punkt ab dem letzten frame behalten
+            if (iFrames < 0f) iFrames = 0f;  // Hier wird iFrames um delta reduziert, damit der Timer richtig abläuft.
+        }
+        //**************************//
+
         player.Update(delta);
 
         playerRectangle.x = player.getX();

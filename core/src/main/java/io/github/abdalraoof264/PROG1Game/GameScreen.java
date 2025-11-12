@@ -58,19 +58,21 @@ public class GameScreen extends AbstractScreen {
 
         // Gdx.input.setInputProcessor(tastatur);   //Tastatur klasse einbringen
 
+        //Score
         scoreFont = new BitmapFont();
         scoreFont.setColor(Color.WHITE);
         scoreFont.getData().setScale(2f);
 
-        //***************************************//
+        // FÜr ide Healthbar
         HealthbarFont = new BitmapFont();
         HealthbarFont.getData().setScale(2f);
         HealthbarFont.setColor(Color.RED);
         shapes = new com.badlogic.gdx.graphics.glutils.ShapeRenderer();
-        //***************************************//
+
 
         gameBackground = new Texture("gameBackground.png");
         player=new Player("player.png",70,183, tastatur);
+
         // Hier kann man Gegner hinzufügen
         enemies.add(new Enemy("enemy1.png", 400, 168, 95, 95));
         enemies.add(new Enemy("enemy1.png", 600, 168, 95, 95));
@@ -99,6 +101,10 @@ public class GameScreen extends AbstractScreen {
     public void render(float delta) {
 
         player.Update(delta);
+
+        if (iFrames > 0f) {
+            iFrames -= delta;
+        }
 
         playerRectangle.x = player.getX();
         playerRectangle.y = player.getY();
@@ -154,12 +160,14 @@ public class GameScreen extends AbstractScreen {
                 && player.getY() <= (enemy.getY() + enemyRectangle.height * 0.9)) {
 
                 if (iFrames <= 0f) {
-                    health -= 1;               // damage amount
-                    iFrames = 1.0f;             // 1 second invulnerability
+                    health -= 1;
+                    iFrames = 1.0f;
 
-                    player.setVelocityY(8f);    // small knockback
+                    player.setVelocityY(8f);
                     player.setIsJumping(true);
+
                 }
+
                 if (health <= 0) {
                     main.setScreen(new GameOverScreen(main));
                     return;
@@ -202,31 +210,27 @@ public class GameScreen extends AbstractScreen {
 
         batch.end();
 
-        // --- HUD: Score text ---
+        //Für Score und Health
         batch.setProjectionMatrix(cameraScore.combined);
         batch.begin();
-        scoreFont.draw(batch, "SCORE: " + score, 20, 580);
+        scoreFont.draw(batch, "SCORE: " + score, 18, 580);
         HealthbarFont.draw(batch, "HP:", 20, 545);
         batch.end();
 
-// --- HUD: Health bar ---
+        // Fülle die Healthbar
         shapes.setProjectionMatrix(cameraScore.combined);
         shapes.begin(com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.Filled);
 
-// bar background
-        float barX = 80, barY = 530, barW = 220, barH = 22;
+        float barX = 80, barY = 522, barW = 220, barH = 22;
         shapes.setColor(Color.DARK_GRAY);
         shapes.rect(barX, barY, barW, barH);
 
-// bar fill
+        // Für damage
         float pct = Math.max(0f, Math.min(1f, health / (float) maxHealth));
         shapes.setColor(Color.RED);
         shapes.rect(barX, barY, barW * pct, barH);
 
         shapes.end();
-
-
-
 
         if(Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)){
             dispose();
@@ -241,7 +245,9 @@ public class GameScreen extends AbstractScreen {
     }
 
     @Override
-    public void dispose() { batch.dispose(); player.dispose();
+    public void dispose() {
+        batch.dispose();
+        player.dispose();
     }
 
 }

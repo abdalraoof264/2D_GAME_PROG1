@@ -87,13 +87,13 @@ public class Player {
             playerPngAktuell = playerLookingDownPng;
             height = 50;
         } else if (left) {
-            playerPngAktuell = playerLeftPng;  // ← jetzt funktioniert es
+            playerPngAktuell = playerLeftPng;
             height = 100;
         } else if (right) {
             playerPngAktuell = playerPng;
             height = 100;
         } else {
-            playerPngAktuell = playerPng; // idle
+            playerPngAktuell = playerPng;
             height = 100;
         }
 

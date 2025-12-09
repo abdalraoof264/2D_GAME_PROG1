@@ -25,6 +25,7 @@ public class GameScreen extends AbstractScreen {
     private BitmapFont HealthbarFont;
     private final int maxHealth = 3;
     private float iFrames = 0f;
+    private boolean isTouching = false;
 
 
     // Für Kollisionen
@@ -204,6 +205,10 @@ public class GameScreen extends AbstractScreen {
                     player.setY(block.getY() + blockRectangle.height);
                     player.setVelocityY(0f);
                     player.setIsJumping(false);
+                }
+                else{
+                    player.setVelocityY(-3f);
+                    player.setIsJumping(true);
                 }
             }
         }

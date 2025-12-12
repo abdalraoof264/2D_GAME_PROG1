@@ -26,13 +26,16 @@ public class Player {
     private Texture playerLookingUpPng;
     private Texture playerLookingDownPng;
     private Texture playerLeftPng;
-
+    private Texture playerLookingDownLeftPng;
+    private Texture playerLookingUp_LeftPng;
 
     public Player(String player1, float startX, float startY, Tastatur tastatur) {
         playerPng = new Texture(player1);
         playerLookingUpPng = new Texture("playerLookingUp.png");
         playerLookingDownPng = new Texture("playerLookingDown.png");
         playerLeftPng= new Texture("playerLeft.png");
+        playerLookingDownLeftPng= new Texture("playerLookingDownLeft.png");
+        playerLookingUp_LeftPng= new Texture("playerLookingUp_Left.png");
         playerPngAktuell = playerPng;
 
         x = startX;
@@ -79,8 +82,15 @@ public class Player {
         if (left)  x -= speed * delta;
         if (right) x += speed * delta;
 
-        // Blickrichtung (exklusive Auswahl!)
-        if (up) {
+        if (up && left) {
+            playerPngAktuell = playerLookingUp_LeftPng;
+            height = 100;
+        } else if (down && left) {
+            playerPngAktuell = playerLookingDownLeftPng;
+            height = 50;
+        } else if (up && right) {
+        } else if (down && right) {
+        } else if (up) {
             playerPngAktuell = playerLookingUpPng;
             height = 100;
         } else if (down) {
@@ -121,5 +131,3 @@ public class Player {
         playerPng.dispose();
     }
 }
-
-

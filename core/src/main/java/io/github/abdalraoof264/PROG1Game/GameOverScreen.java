@@ -27,6 +27,7 @@ public class GameOverScreen extends AbstractScreen {
         infoFont = new BitmapFont();
         infoFont.setColor(Color.WHITE);
         infoFont.getData().setScale(2f);
+        MusicManager.getInstance().playGameOverMusic();
     }
 
     public void render(float delta){

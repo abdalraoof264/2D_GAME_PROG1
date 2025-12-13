@@ -31,13 +31,18 @@ public class GameScreen extends AbstractScreen {
     private Texture heartFull;
     private Texture heartEmpty;
 
-    // Für Kollisionen
-    private Rectangle playerRectangle = new Rectangle(70, 183, 65, 65);
+    // ========== LEVEL SYSTEM ==========
+    private Level currentLevel;
+    private int currentLevelNumber = 1;
+    private int coinsCollectedInLevel = 0;
 
-    // Für verschiedene Gegner
-    private ArrayList<Enemy> enemies = new ArrayList<>();
-    private ArrayList<Item> items = new ArrayList<>();
-    private ArrayList<Block> blocks = new ArrayList<>();
+    // Für Kollisionen
+    private Rectangle playerRectangle = new Rectangle(0, 0, 0, 0);
+
+    // Für verschiedene Gegner, Items, Blöcke
+    private ArrayList<Enemy> enemies;
+    private ArrayList<Item> items;
+    private ArrayList<Block> blocks;
 
     // Wichtig für das Skalieren des Hintergrunds
     private OrthographicCamera camera;
@@ -59,7 +64,8 @@ public class GameScreen extends AbstractScreen {
         batch = new SpriteBatch();
         tastatur = new Tastatur();
 
-        // Gdx.input.setInputProcessor(tastatur);   //Tastatur klasse einbringen
+        // ⚠️ WICHTIG: Tastatur aktivieren! ⚠️
+        Gdx.input.setInputProcessor(tastatur);
 
         //Score
         scoreFont = new BitmapFont();
@@ -77,19 +83,10 @@ public class GameScreen extends AbstractScreen {
         heartEmpty = new Texture("heart_empty.png");
 
         gameBackground = new Texture("gameBackground.png");
-        player=new Player("player.png",70,105, tastatur);
+        player = new Player("player.png", 70, 105, tastatur);
 
-        // Hier kann man Gegner hinzufügen
-        // Default Patrol-Range (100px links, 200px rechts)
-        enemies.add(new Enemy("enemy1.png", 400, 100, 95, 95, 150f, 50f));
-        enemies.add(new Enemy("enemy1.png", 600, 100, 95, 95 ));
-
-        // Hier kann man Items hinzufügen
-        items.add(new Item("Muenzen.png", 500, 300));
-        items.add(new Item("Muenzen.png", 1000, 200));
-
-        //Hier kann man Blöcke hinzufügen
-        blocks.add(new Block("Block.png", 500, 200));
+        // ========== LEVEL LADEN ==========
+        loadLevel(1);  // Starte mit Level 1
 
         // Für das die Skalierung
         camera = new OrthographicCamera();
@@ -100,6 +97,41 @@ public class GameScreen extends AbstractScreen {
         // Für die Score leiste
         cameraScore = new OrthographicCamera();
         cameraScore.setToOrtho(false, 800, 600);
+        MusicManager.getInstance().playGameMusic();
+    }
+
+    /**
+     * LEVEL LADEN
+     */
+    private void loadLevel(int levelNumber) {
+        // Erstelle das passende Level-Objekt
+        if (levelNumber == 1) {
+            currentLevel = new Level1();
+        } else if (levelNumber == 2) {
+            currentLevel = new Level2();
+        } else {
+            // Alle Levels durchgespielt!
+            main.setScreen(new VictoryScreen(main));
+            return;
+        }
+
+        // Level initialisieren
+        currentLevel.loadLevel();
+
+        // Hole die Listen aus dem Level
+        enemies = currentLevel.getEnemies();
+        items = currentLevel.getItems();
+        blocks = currentLevel.getBlocks();
+
+        // Reset für das neue Level
+        coinsCollectedInLevel = 0;
+        currentLevelNumber = levelNumber;
+
+        // Spieler an Startposition setzen
+        player.setX(70);
+        player.setY(105);
+
+        System.out.println("Level " + levelNumber + " geladen! Benötigte Münzen: " + currentLevel.getRequiredCoins());
     }
 
     @Override
@@ -111,8 +143,11 @@ public class GameScreen extends AbstractScreen {
             iFrames -= delta;
         }
 
+        // UPDATE PLAYER RECTANGLE MIT AKTUELLER GRÖSSE!
         playerRectangle.x = player.getX();
         playerRectangle.y = player.getY();
+        playerRectangle.width = 65;   // Player width ist immer 65
+        playerRectangle.height = 65;  // Basis height
 
         camera.position.x = player.getX();
         camera.update();
@@ -138,14 +173,15 @@ public class GameScreen extends AbstractScreen {
 
         //Für Hintergrund wiederholungen
         for (int i = -1; i <= 5; i++) {
-            batch.draw(gameBackground, (i * newWidth),0,newWidth,newHeight);
+            batch.draw(gameBackground, (i * newWidth), 0, newWidth, newHeight);
         }
 
         player.render(batch);
 
+        // ========== ENEMY KOLLISION ==========
         Rectangle enemyRectangle = new Rectangle(0, 0, 95, 108);
 
-        for (int i = 0; i < enemies.size(); i++ ) {
+        for (int i = 0; i < enemies.size(); i++) {
             Enemy enemy = enemies.get(i);
             enemy.update(delta);
             enemy.render(batch);
@@ -153,10 +189,9 @@ public class GameScreen extends AbstractScreen {
             enemyRectangle.x = enemy.getX();
             enemyRectangle.y = enemy.getY();
 
-
-            if(playerRectangle.overlaps(enemyRectangle) && player.getY() > (enemy.getY() + enemyRectangle.height * 0.9)){
+            if (playerRectangle.overlaps(enemyRectangle) && player.getY() > (enemy.getY() + enemyRectangle.height * 0.9)) {
                 enemies.remove(enemy);
-                player.setVelocityY(10f);
+                player.setVelocityY(-8f);
                 player.setIsJumping(true);
                 continue;
             }
@@ -168,7 +203,7 @@ public class GameScreen extends AbstractScreen {
                     health -= 1;
                     iFrames = 2.0f;
 
-                    player.setVelocityY(8f);
+                    player.setVelocityY(-8f);
                     player.setIsJumping(true);
 
                 }
@@ -181,75 +216,110 @@ public class GameScreen extends AbstractScreen {
 
         }
 
+        // ========== ITEM KOLLISION ==========
         Rectangle itemRectangle = new Rectangle(0, 0, 70, 70);
 
-        for(int i = 0; i < items.size(); i++){
+        for (int i = 0; i < items.size(); i++) {
             Item item = items.get(i);
             item.render(batch);
             itemRectangle.x = item.getX();
             itemRectangle.y = item.getY();
 
-            if(playerRectangle.overlaps(itemRectangle)){
+            if (playerRectangle.overlaps(itemRectangle)) {
                 items.remove(item);
                 score++;
+                coinsCollectedInLevel++;
+
+                // ========== LEVEL ABSCHLUSS CHECK ==========
+                if (coinsCollectedInLevel >= currentLevel.getRequiredCoins()) {
+                    System.out.println("Level " + currentLevelNumber + " abgeschlossen!");
+                    loadLevel(currentLevelNumber + 1);
+                }
             }
         }
 
+        // ========== BLOCK KOLLISION (FINAL FIX) ==========
         Rectangle blockRectangle = new Rectangle(0, 0, 60, 60);
 
-        for(int i = 0; i < blocks.size(); i++){
+        for (int i = 0; i < blocks.size(); i++) {
             Block block = blocks.get(i);
             block.render(batch);
             blockRectangle.x = block.getX();
             blockRectangle.y = block.getY();
 
-            if(playerRectangle.overlaps(blockRectangle)){
+            if (playerRectangle.overlaps(blockRectangle)) {
 
-                if(player.getY() >= (block.getY() + blockRectangle.height) -20 && player.getVelocityY() <= 0) {
-                    player.setY(block.getY() + blockRectangle.height);
+                // Berechne Überlappung von allen Seiten
+                float overlapLeft = (playerRectangle.x + playerRectangle.width) - blockRectangle.x;
+                float overlapRight = (blockRectangle.x + blockRectangle.width) - playerRectangle.x;
+                float overlapTop = (playerRectangle.y + playerRectangle.height) - blockRectangle.y;
+                float overlapBottom = (blockRectangle.y + blockRectangle.height) - playerRectangle.y;
+
+                // Finde die kleinste Überlappung
+                float minOverlap = Math.min(Math.min(overlapLeft, overlapRight),
+                    Math.min(overlapTop, overlapBottom));
+
+                // Reagiere basierend auf der kleinsten Überlappung
+                if (minOverlap == overlapBottom && player.getVelocityY() >= 0) {
+                    // VON OBEN auf Block landen (nur wenn fallend!)
+                    player.setY(blockRectangle.y + blockRectangle.height);
                     player.setVelocityY(0f);
                     player.setIsJumping(false);
+                    player.setIsGrounded(true);
+
+                } else if (minOverlap == overlapTop && player.getVelocityY() < 0) {
+                    // VON UNTEN gegen Block (nur wenn springend!)
+                    player.setY(blockRectangle.y - playerRectangle.height);
+                    player.setVelocityY(0.5f);
+
+                } else if (minOverlap == overlapLeft) {
+                    // VON LINKS gegen Block
+                    player.setX(blockRectangle.x - playerRectangle.width);
+
+                } else if (minOverlap == overlapRight) {
+                    // VON RECHTS gegen Block
+                    player.setX(blockRectangle.x + blockRectangle.width);
                 }
-                else{
-                    player.setVelocityY(-3f);
-                    player.setIsJumping(true);
-                }
+
+                // Update Rectangle nach Kollision
+                playerRectangle.x = player.getX();
+                playerRectangle.y = player.getY();
             }
         }
 
         batch.end();
 
-        //Für Score und Hearts
+        //Für Score, Level und Hearts
         batch.setProjectionMatrix(cameraScore.combined);
         batch.begin();
+
         scoreFont.draw(batch, "SCORE: " + score, 18, 580);
+        scoreFont.draw(batch, "LEVEL: " + currentLevelNumber, 18, 550);
 
         // Draw hearts
         float heartX = 20;
-        float heartY = 515;
-        float heartSize = 32; // Size of each heart
-        float heartSpacing = 40; // Space between hearts
+        float heartY = 490;  // Etwas tiefer wegen Level-Anzeige
+        float heartSize = 32;
+        float heartSpacing = 40;
 
         for (int i = 0; i < maxHealth; i++) {
             if (i < health) {
-                // Draw full heart
                 batch.draw(heartFull, heartX + (i * heartSpacing), heartY, heartSize, heartSize);
             } else {
-                // Draw empty heart
                 batch.draw(heartEmpty, heartX + (i * heartSpacing), heartY, heartSize, heartSize);
             }
         }
 
         batch.end();
 
-        if(Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)){
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
             dispose();
             main.setScreen(new MenuScreen(main));
         }
     }
 
     @Override
-    public void resize(int width, int height){
+    public void resize(int width, int height) {
         viewport.update(width, height, true);
     }
 
@@ -259,6 +329,10 @@ public class GameScreen extends AbstractScreen {
         player.dispose();
         heartFull.dispose();
         heartEmpty.dispose();
+
+        for (Enemy enemy : enemies) {
+            enemy.dispose();
+        }
     }
 
 }

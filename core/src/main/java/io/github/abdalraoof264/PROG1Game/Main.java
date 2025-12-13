@@ -18,4 +18,16 @@ public class Main extends Game {
     public void create() {
         setScreen(new MenuScreen(this));
     }
+    @Override
+    public void dispose() {
+        // Dispose MusicManager (Singleton wird nur einmal disposed)
+        MusicManager.getInstance().dispose();
+
+        // Dispose current screen
+        if (getScreen() != null) {
+            getScreen().hide();
+        }
+
+        super.dispose();
+    }
 }

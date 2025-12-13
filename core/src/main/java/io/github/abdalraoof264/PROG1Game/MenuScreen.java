@@ -35,6 +35,7 @@ public class MenuScreen extends AbstractScreen {
         viewport = new FitViewport(800, 600, camera);
         viewport.apply();
         camera.position.set(camera.viewportWidth / 2, camera.viewportHeight / 2, 0);
+        MusicManager.getInstance().playMenuMusic();
     }
 
     @Override

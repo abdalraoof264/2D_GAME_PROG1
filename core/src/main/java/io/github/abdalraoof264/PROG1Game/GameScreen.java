@@ -27,6 +27,9 @@ public class GameScreen extends AbstractScreen {
     private float iFrames = 0f;
     private boolean isTouching = false;
 
+    // Heart textures
+    private Texture heartFull;
+    private Texture heartEmpty;
 
     // Für Kollisionen
     private Rectangle playerRectangle = new Rectangle(70, 183, 65, 65);
@@ -42,7 +45,6 @@ public class GameScreen extends AbstractScreen {
 
     // Für die Score leiste damit die es im Bild bleibt
     private OrthographicCamera cameraScore;
-
 
     //***************************************//
     private com.badlogic.gdx.graphics.glutils.ShapeRenderer shapes;
@@ -64,19 +66,23 @@ public class GameScreen extends AbstractScreen {
         scoreFont.setColor(Color.WHITE);
         scoreFont.getData().setScale(2f);
 
-        // FÜr ide Healthbar
+        // Für die Healthbar
         HealthbarFont = new BitmapFont();
         HealthbarFont.getData().setScale(2f);
         HealthbarFont.setColor(Color.RED);
         shapes = new com.badlogic.gdx.graphics.glutils.ShapeRenderer();
 
+        // Load heart textures
+        heartFull = new Texture("heart_full.png");
+        heartEmpty = new Texture("heart_empty.png");
 
         gameBackground = new Texture("gameBackground.png");
         player=new Player("player.png",70,105, tastatur);
 
         // Hier kann man Gegner hinzufügen
-        enemies.add(new Enemy("enemy1.png", 400, 100, 95, 95));
-        enemies.add(new Enemy("enemy1.png", 600, 100, 95, 95));
+        // Default Patrol-Range (100px links, 200px rechts)
+        enemies.add(new Enemy("enemy1.png", 400, 100, 95, 95, 150f, 50f));
+        enemies.add(new Enemy("enemy1.png", 600, 100, 95, 95 ));
 
         // Hier kann man Items hinzufügen
         items.add(new Item("Muenzen.png", 500, 300));
@@ -94,8 +100,6 @@ public class GameScreen extends AbstractScreen {
         // Für die Score leiste
         cameraScore = new OrthographicCamera();
         cameraScore.setToOrtho(false, 800, 600);
-
-
     }
 
     @Override
@@ -215,32 +219,32 @@ public class GameScreen extends AbstractScreen {
 
         batch.end();
 
-        //Für Score und Health
+        //Für Score und Hearts
         batch.setProjectionMatrix(cameraScore.combined);
         batch.begin();
         scoreFont.draw(batch, "SCORE: " + score, 18, 580);
-        HealthbarFont.draw(batch, "HP:", 20, 545);
+
+        // Draw hearts
+        float heartX = 20;
+        float heartY = 515;
+        float heartSize = 32; // Size of each heart
+        float heartSpacing = 40; // Space between hearts
+
+        for (int i = 0; i < maxHealth; i++) {
+            if (i < health) {
+                // Draw full heart
+                batch.draw(heartFull, heartX + (i * heartSpacing), heartY, heartSize, heartSize);
+            } else {
+                // Draw empty heart
+                batch.draw(heartEmpty, heartX + (i * heartSpacing), heartY, heartSize, heartSize);
+            }
+        }
+
         batch.end();
-
-        // Fülle die Healthbar
-        shapes.setProjectionMatrix(cameraScore.combined);
-        shapes.begin(com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType.Filled);
-
-        float barX = 80, barY = 522, barW = 220, barH = 22;
-        shapes.setColor(Color.DARK_GRAY);
-        shapes.rect(barX, barY, barW, barH);
-
-        // Für damage
-        float pct = Math.max(0f, Math.min(1f, health / (float) maxHealth));
-        shapes.setColor(Color.RED);
-        shapes.rect(barX, barY, barW * pct, barH);
-
-        shapes.end();
 
         if(Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)){
             dispose();
             main.setScreen(new MenuScreen(main));
-
         }
     }
 
@@ -253,6 +257,8 @@ public class GameScreen extends AbstractScreen {
     public void dispose() {
         batch.dispose();
         player.dispose();
+        heartFull.dispose();
+        heartEmpty.dispose();
     }
 
 }

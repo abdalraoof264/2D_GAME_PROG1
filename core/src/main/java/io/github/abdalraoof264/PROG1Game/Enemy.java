@@ -14,7 +14,8 @@ public class Enemy {
     private float minX, maxX;     // Patrol boundaries
     private int direction = 1;    // 1 = right, -1 = left
 
-    public Enemy(String texturePath, float startX, float startY, float width, float height) {
+    // Constructor with custom patrol range
+    public Enemy(String texturePath, float startX, float startY, float width, float height, float patrolLeft, float patrolRight) {
         this.texture = new Texture(texturePath);
         this.x = startX;
         this.y = startY;
@@ -23,9 +24,14 @@ public class Enemy {
         enemyRight = new Texture("enemy1.png");
         enemyLeft  = new Texture("enemy_1_Left.png");
 
-        // Patrol range: 200px left to 200px right of spawn
-        this.minX = startX - 100f;
-        this.maxX = startX + 200f;
+        // Custom patrol range
+        this.minX = startX - patrolLeft;
+        this.maxX = startX + patrolRight;
+    }
+
+    // Overloaded constructor for default patrol range (backwards compatibility)
+    public Enemy(String texturePath, float startX, float startY, float width, float height) {
+        this(texturePath, startX, startY, width, height, 100f, 200f);
     }
 
     public void update(float dt) {
@@ -48,7 +54,24 @@ public class Enemy {
         batch.draw(current, x, y, width, height);
     }
 
+    // Getters
     public float getX() { return x; }
     public float getY() { return y; }
-    public void dispose() { texture.dispose(); }
+
+    // Optional: Methods to modify patrol range after creation
+    public void setPatrolRange(float patrolLeft, float patrolRight) {
+        this.minX = x - patrolLeft;
+        this.maxX = x + patrolRight;
+    }
+
+    public void setPatrolBoundaries(float minX, float maxX) {
+        this.minX = minX;
+        this.maxX = maxX;
+    }
+
+    public void dispose() {
+        texture.dispose();
+        enemyRight.dispose();
+        enemyLeft.dispose();
+    }
 }

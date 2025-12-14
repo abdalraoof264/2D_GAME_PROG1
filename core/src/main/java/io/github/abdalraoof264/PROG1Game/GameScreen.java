@@ -213,7 +213,7 @@ public class GameScreen extends AbstractScreen {
             enemyRectangle.y = enemy.getY();
 
             // Wenn der Spieler auf den Gegner springt
-            if (playerRectangle.overlaps(enemyRectangle) && player.getY() > (enemy.getY() + enemyRectangle.height * 0.9)) {
+            if (playerRectangle.overlaps(enemyRectangle) && player.getY() > (enemy.getY() + enemyRectangle.height * 0.8)) {
                 enemies.remove(enemy);
                 player.setVelocityY(-8f);
                 continue;
@@ -221,7 +221,7 @@ public class GameScreen extends AbstractScreen {
 
             // Wenn der Spieler schaden bekommt
             if (playerRectangle.overlaps(enemyRectangle)
-                && player.getY() < (enemy.getY() + enemyRectangle.height * 0.9)) {
+                && player.getY() < (enemy.getY() + enemyRectangle.height * 0.8)) {
 
                 if (iFrames <= 0f) {
                     health -= 1;

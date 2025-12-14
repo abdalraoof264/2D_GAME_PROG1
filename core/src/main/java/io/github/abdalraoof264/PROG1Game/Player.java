@@ -3,12 +3,10 @@ package io.github.abdalraoof264.PROG1Game;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-/**
- * Player-Klasse mit MARIO-STYLE Physik
- * FIXED: Keine Teleport-Loops mehr!
- */
 public class Player {
-    // Texturen
+
+    // Alle notwendigen Instanzvariablen
+    // Die Texturen, welche unser Player benötigt
     private Texture playerPng;
     private Texture playerPngAktuell;
     private Texture playerLeftPng;
@@ -17,25 +15,22 @@ public class Player {
     private Texture playerLookingUp_LeftPng;
     private Texture playerLookingDownLeftPng;
 
-    // Position und Größe
+    // Fuer Position, Groeße und Geschwindigkeit
     private float x, y;
     private float width, height;
-    private float speed = 200f;
+    private float speed = 300f;
 
-    // Sprung Physik - MARIO-STYLE (ANGEPASST FÜR HÖHEREN SPRUNG)
-    private boolean isJumping = false;
-    private boolean isGrounded = false;  // NEU: Ist der Spieler am Boden?
+    // Unsere Variablen fuer die Sprung-Physik
+    private boolean isGrounded = false;
     private float gravity = 0.5f;
     private float jumpVelocity = -15.0f;
     private float velocityY = 0f;
     private float maxFallSpeed = 15f;
 
-    // Tastatur-Referenz
+    // Tastatur, welche wir benutzen für die Eingaben
     private Tastatur tastatur;
 
-    /**
-     * Konstruktor
-     */
+    // Unser Konstruktor, mit dem wir den Spieler initialisieren
     public Player(String texturePath, float startX, float startY, Tastatur tastatur) {
         this.playerPng = new Texture(texturePath);
         this.playerPngAktuell = playerPng;
@@ -45,7 +40,7 @@ public class Player {
         this.height = 100;
         this.tastatur = tastatur;
 
-        // Lade alle Sprite-Varianten
+        // Wichtig für die Sprite-Rotationen
         playerLeftPng = new Texture("playerLeft.png");
         playerLookingUpPng = new Texture("playerLookingUp.png");
         playerLookingDownPng = new Texture("playerLookingDown.png");
@@ -53,56 +48,72 @@ public class Player {
         playerLookingDownLeftPng = new Texture("playerLookingDownLeft.png");
     }
 
-    /**
-     * Update-Methode - wird jeden Frame aufgerufen
-     * WICHTIG: Nur Physik, keine Kollision!
-     */
+    // Diese Methode ermöglicht es, das der Spieler sich im Spiel bewegt
     public void Update(float delta) {
 
-        // ========== BEWEGUNG ==========
-        if (tastatur.left)  x -= speed * delta;
-        if (tastatur.right) x += speed * delta;
+        // Bringt den Spieler in Bewegung, durch Tastendruck veraendert sich seine Position
+        if (tastatur.left) {
+            x -= speed * delta;
+        }
 
-        // ========== SPRITE RICHTUNG ==========
+        if (tastatur.right){
+            x += speed * delta;
+        }
+
+
+        // Hier entscheidet sich, in welche Richtung der Spieler schaut, je nach eingabe
         if (tastatur.up && tastatur.left) {
             playerPngAktuell = playerLookingUp_LeftPng;
             height = 100;
-        } else if (tastatur.down && tastatur.left) {
+        }
+
+        else if (tastatur.down && tastatur.left) {
             playerPngAktuell = playerLookingDownLeftPng;
             height = 50;
-        } else if (tastatur.up && tastatur.right) {
+        }
+
+        else if (tastatur.up && tastatur.right) {
             playerPngAktuell = playerLookingUpPng;
             height = 100;
-        } else if (tastatur.down && tastatur.right) {
+        }
+
+        else if (tastatur.down && tastatur.right) {
             playerPngAktuell = playerLookingDownPng;
             height = 50;
-        } else if (tastatur.up) {
+        }
+
+        else if (tastatur.up) {
             playerPngAktuell = playerLookingUpPng;
             height = 100;
-        } else if (tastatur.down) {
+        }
+
+        else if (tastatur.down) {
             playerPngAktuell = playerLookingDownPng;
             height = 50;
-        } else if (tastatur.left) {
+        }
+
+        else if (tastatur.left) {
             playerPngAktuell = playerLeftPng;
             height = 100;
-        } else if (tastatur.right) {
-            playerPngAktuell = playerPng;
-            height = 100;
-        } else {
+        }
+
+        else if (tastatur.right) {
             playerPngAktuell = playerPng;
             height = 100;
         }
 
-        // ========== SPRUNG PHYSIK ==========
+        else {
+            playerPngAktuell = playerPng;
+            height = 100;
+        }
 
-        // Springen (nur wenn am Boden)
+        // Sobald der Spieler sich auf dem Boden befindet und dann gesprungen wird, springt er
         if (isGrounded && tastatur.spaceJustPressed) {
             velocityY = jumpVelocity;
-            isJumping = true;
             isGrounded = false;
         }
 
-        // Schwerkraft IMMER anwenden
+        // Der Spieler wird permanent von oben nach unten gezogen
         velocityY += gravity;
 
         // Maximale Fallgeschwindigkeit
@@ -113,30 +124,30 @@ public class Player {
         // Position aktualisieren
         y -= velocityY;
 
-        // ========== BODEN-KOLLISION (FALLBACK) ==========
+        // Der Spieler soll nicht nach unten fallen
         if (y <= 105) {
             y = 105;
             velocityY = 0;
-            isJumping = false;
             isGrounded = true;
         }
 
-        // Linke Grenze
+        // Er darf nicht nach Links oder Rechts aus dem Rand
         if (x < 0) x = 0;
 
-        // ========== TASTATUR UPDATE ==========
+        if(x > 5000){
+            x = 5000;
+        }
+
+        // Die Tastatur aktulaisiert sich
         tastatur.update();
     }
 
-    /**
-     * Render-Methode - zeichnet den Spieler
-     */
+    // Hier wird unser Spieler gezeichnet
     public void render(SpriteBatch batch) {
         batch.draw(playerPngAktuell, x, y, width, height);
     }
 
-    // ========== GETTER & SETTER ==========
-
+    // Hier sind sämtliche getter und setter Methoden, welche wir benutzt hatten
     public float getX() {
         return x;
     }
@@ -161,10 +172,6 @@ public class Player {
         this.velocityY = velocityY;
     }
 
-    public void setIsJumping(boolean jumping) {
-        this.isJumping = jumping;
-    }
-
     public void setIsGrounded(boolean grounded) {  // NEU!
         this.isGrounded = grounded;
     }
@@ -173,9 +180,7 @@ public class Player {
         return isGrounded;
     }
 
-    /**
-     * Dispose - gibt Ressourcen frei
-     */
+    // Am Ende wird alles unnötige gelöscht, wenn es nicht mehr gebraucht wird
     public void dispose() {
         playerPng.dispose();
         playerLeftPng.dispose();

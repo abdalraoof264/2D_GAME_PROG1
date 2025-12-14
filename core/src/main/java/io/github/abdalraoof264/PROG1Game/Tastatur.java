@@ -3,31 +3,43 @@ package io.github.abdalraoof264.PROG1Game;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 
-/**
- * Tastatur-Klasse für Input-Handling
- * Verwaltet alle Tastatur-Eingaben
- */
 public class Tastatur implements InputProcessor {
 
-    // Bewegungstasten (gehalten)
-    public boolean up, down, left, right;
+    // Boolsche Variablen
+    public boolean up;
+    public boolean down;
+    public boolean left;
+    public boolean right;
 
-    // Space-Taste
-    public boolean space;              // Ist die Taste gedrückt?
-    public boolean spaceJustPressed;   // Wurde sie gerade erst gedrückt?
+    // Leertaste Taste
+    public boolean space;
+    // Wurde sie schon gedrueckt?
+    public boolean spaceJustPressed;
 
+    // Wir implementieren die Methode aus dem Interface
     @Override
     public boolean keyDown(int keycode) {
-        // Bewegungstasten
-        if (keycode == Input.Keys.UP)    up = true;
-        if (keycode == Input.Keys.DOWN)  down = true;
-        if (keycode == Input.Keys.LEFT)  left = true;
-        if (keycode == Input.Keys.RIGHT) right = true;
 
-        // Space-Taste (nur beim ersten Drücken)
+        // Bewegungstasten
+        if (keycode == Input.Keys.UP){
+            up = true;
+        }
+
+        if (keycode == Input.Keys.DOWN) {
+            down = true;
+        }
+        if (keycode == Input.Keys.LEFT) {
+            left = true;
+        }
+
+        if (keycode == Input.Keys.RIGHT){
+            right = true;
+        }
+
+        // Space Taste nur beim ersten Druecken
         if (keycode == Input.Keys.SPACE && !space) {
             space = true;
-            spaceJustPressed = true;  // Nur beim ersten Mal true
+            spaceJustPressed = true;
         }
 
         return true;
@@ -35,27 +47,36 @@ public class Tastatur implements InputProcessor {
 
     @Override
     public boolean keyUp(int keycode) {
-        // Bewegungstasten
-        if (keycode == Input.Keys.UP)    up = false;
-        if (keycode == Input.Keys.DOWN)  down = false;
-        if (keycode == Input.Keys.LEFT)  left = false;
-        if (keycode == Input.Keys.RIGHT) right = false;
 
-        // Space-Taste
+        // Bewegungstasten
+        if (keycode == Input.Keys.UP) {
+            up = false;
+        }
+
+        if (keycode == Input.Keys.DOWN){
+            down = false;
+        }
+
+        if (keycode == Input.Keys.LEFT){
+            left = false;
+        }
+
+        if (keycode == Input.Keys.RIGHT){
+            right = false;
+        }
+
+        // Space Taste
         if (keycode == Input.Keys.SPACE) space = false;
 
         return true;
     }
 
-    /**
-     * WICHTIG: Muss jeden Frame aufgerufen werden!
-     * Setzt spaceJustPressed zurück
-     */
+   // Wir setzen es nach jedem Sprung zurueck
     public void update() {
-        spaceJustPressed = false;  // Reset nach jedem Frame
+        spaceJustPressed = false;
     }
 
-    // Ungenutzte InputProcessor Methoden
+    // Ungenutzte Methoden, welche wir einbauen muessen, weil es ein Interface ist
     @Override
     public boolean keyTyped(char character) {
         return false;

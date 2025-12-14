@@ -3,16 +3,12 @@ package io.github.abdalraoof264.PROG1Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 
-/**
- * Singleton MusicManager
- * Verwaltet die Hintergrundmusik im gesamten Spiel
- */
 public class MusicManager {
 
-    // Singleton Instance
+    // Singleton Instanz
     private static MusicManager instance;
 
-    // Die Musik-Objekte
+    // Die Musik Objekte
     private Music menuMusic;
     private Music gameMusic;
     private Music gameOverMusic;
@@ -21,14 +17,13 @@ public class MusicManager {
     // Aktuell spielende Musik
     private Music currentMusic;
 
-    // Lautstärke (0.0 bis 1.0)
+    // Lautstärkevon 0.0 bis 1.0
     private float volume = 0.5f;
 
-    /**
-     * Private Konstruktor (Singleton Pattern)
-     */
+    // Privater Singleton Pattern Konstruktor
     private MusicManager() {
         // Lade alle Musik-Dateien
+        // Falls ein Problem, entsteht fangen wir es ab
         try {
             menuMusic = Gdx.audio.newMusic(Gdx.files.internal("menu_music.mp3"));
             gameMusic = Gdx.audio.newMusic(Gdx.files.internal("game_music.mp3"));
@@ -46,9 +41,7 @@ public class MusicManager {
         }
     }
 
-    /**
-     * Singleton Instance holen
-     */
+
     public static MusicManager getInstance() {
         if (instance == null) {
             instance = new MusicManager();
@@ -56,37 +49,27 @@ public class MusicManager {
         return instance;
     }
 
-    /**
-     * Spiele Menu-Musik
-     */
+    // Spielt Menue Musik
     public void playMenuMusic() {
         playMusic(menuMusic);
     }
 
-    /**
-     * Spiele Game-Musik
-     */
+    // Spielt Spiel Musik
     public void playGameMusic() {
         playMusic(gameMusic);
     }
 
-    /**
-     * Spiele GameOver-Musik
-     */
+    // Spielt Gameover Musik
     public void playGameOverMusic() {
         playMusic(gameOverMusic);
     }
 
-    /**
-     * Spiele Victory-Musik
-     */
+    // Spielt die Victory
     public void playVictoryMusic() {
         playMusic(victoryMusic);
     }
 
-    /**
-     * Interne Methode zum Wechseln der Musik
-     */
+
     private void playMusic(Music music) {
         if (music == null) {
             System.err.println("Musik-Datei nicht gefunden!");
@@ -104,36 +87,28 @@ public class MusicManager {
         currentMusic.play();
     }
 
-    /**
-     * Stoppe alle Musik
-     */
+    // Soppt die Musik
     public void stopMusic() {
         if (currentMusic != null && currentMusic.isPlaying()) {
             currentMusic.stop();
         }
     }
 
-    /**
-     * Pause Musik
-     */
+    // Pausiert die Musik
     public void pauseMusic() {
         if (currentMusic != null && currentMusic.isPlaying()) {
             currentMusic.pause();
         }
     }
 
-    /**
-     * Resume Musik
-     */
+   // Setzt Musik fort
     public void resumeMusic() {
         if (currentMusic != null && !currentMusic.isPlaying()) {
             currentMusic.play();
         }
     }
 
-    /**
-     * Setze Lautstärke (0.0 bis 1.0)
-     */
+   // Setzt die Lautstärke
     public void setVolume(float volume) {
         this.volume = Math.max(0f, Math.min(1f, volume));  // Clamp zwischen 0 und 1
         if (currentMusic != null) {
@@ -141,37 +116,23 @@ public class MusicManager {
         }
     }
 
-    /**
-     * Erhöhe Lautstärke
-     */
     public void increaseVolume() {
         setVolume(volume + 0.1f);
     }
 
-    /**
-     * Verringere Lautstärke
-     */
     public void decreaseVolume() {
         setVolume(volume - 0.1f);
     }
 
-    /**
-     * Hole aktuelle Lautstärke
-     */
     public float getVolume() {
         return volume;
     }
 
-    /**
-     * Ist Musik am Spielen?
-     */
     public boolean isPlaying() {
         return currentMusic != null && currentMusic.isPlaying();
     }
 
-    /**
-     * Dispose - Ressourcen freigeben
-     */
+    // Loescht die Musik
     public void dispose() {
         if (menuMusic != null) menuMusic.dispose();
         if (gameMusic != null) gameMusic.dispose();

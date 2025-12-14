@@ -3,13 +3,17 @@ package io.github.abdalraoof264.PROG1Game;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
+// Klasse Item
 public class Item {
+
+    // Instanzvariablen
     private Texture texture;
     private float x;
     private float y;
     private float width;
     private float height;
 
+    // Konstruktor
     public Item(String item, float x, float y) {
         this.texture = new Texture(item);
         this.x = x;
@@ -18,6 +22,7 @@ public class Item {
         this.height = 70;
     }
 
+    // Getter und Setter
     public float getX() {
         return x;
     }

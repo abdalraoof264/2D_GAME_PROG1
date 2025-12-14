@@ -2,30 +2,26 @@ package io.github.abdalraoof264.PROG1Game;
 
 import java.util.ArrayList;
 
-/**
- * Abstrakte Basis-Klasse für alle Levels
- * Jedes Level erbt von dieser Klasse und implementiert loadLevel()
- */
+// Unsere Abstrakte Klasse, welche die Basis fuer die beiden Level ist
 public abstract class Level {
+
+    // Die Gegner Liste und Muenzen die gesammelt werden
     protected ArrayList<Enemy> enemies;
     protected ArrayList<Item> items;
     protected ArrayList<Block> blocks;
-    protected int requiredCoins;  // Wie viele Münzen man sammeln muss
-    protected String backgroundTexture;  // Hintergrund für das Level
+    protected int requiredCoins;
 
+    // Konstruktor
     public Level() {
         enemies = new ArrayList<>();
         items = new ArrayList<>();
         blocks = new ArrayList<>();
     }
 
-    /**
-     * Diese Methode muss jedes Level implementieren
-     * Hier werden Gegner, Items und Blöcke hinzugefügt
-     */
-    public abstract void loadLevel();
+   // Diese Methode nimmt jede Klasse zum hinzufuegen
+   public abstract void loadLevel();
 
-    // Getter-Methoden
+    // Getter Methoden
     public ArrayList<Enemy> getEnemies() {
         return enemies;
     }
@@ -40,9 +36,5 @@ public abstract class Level {
 
     public int getRequiredCoins() {
         return requiredCoins;
-    }
-
-    public String getBackgroundTexture() {
-        return backgroundTexture;
     }
 }

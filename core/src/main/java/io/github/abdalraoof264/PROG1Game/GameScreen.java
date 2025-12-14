@@ -13,33 +13,37 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.math.Rectangle;
 import java.util.ArrayList;
 
+// Klasse Gamescreen erbt von AbstractScreen
 public class GameScreen extends AbstractScreen {
-    private SpriteBatch batch;
+
+    // notwendige Variablen
     private Player player;
     private Tastatur tastatur;
     private Main main;
     private Texture gameBackground;
-    private BitmapFont scoreFont;
+
+    // Schriften, Anzeige
     private int score = 0;
     private int health = 3;
+    private SpriteBatch batch;
+    private BitmapFont scoreFont;
     private BitmapFont HealthbarFont;
+    private BitmapFont startQuest;
     private final int maxHealth = 3;
     private float iFrames = 0f;
-    private boolean isTouching = false;
 
-    // Heart textures
     private Texture heartFull;
     private Texture heartEmpty;
 
-    // ========== LEVEL SYSTEM ==========
+    // Fuer das aktuelle Level
     private Level currentLevel;
     private int currentLevelNumber = 1;
     private int coinsCollectedInLevel = 0;
 
-    // Für Kollisionen
+    // Fuer Kollisionen
     private Rectangle playerRectangle = new Rectangle(0, 0, 0, 0);
 
-    // Für verschiedene Gegner, Items, Blöcke
+    // Für verschiedene Gegner, Items, Bloecke in Liste
     private ArrayList<Enemy> enemies;
     private ArrayList<Item> items;
     private ArrayList<Block> blocks;
@@ -51,23 +55,24 @@ public class GameScreen extends AbstractScreen {
     // Für die Score leiste damit die es im Bild bleibt
     private OrthographicCamera cameraScore;
 
-    //***************************************//
     private com.badlogic.gdx.graphics.glutils.ShapeRenderer shapes;
 
+    // Konstruktor
     public GameScreen(Main main) {
         this.main = main;
     }
 
+    // Alles was im Bild nachher gezeigt wird
     @Override
     public void show() {
 
         batch = new SpriteBatch();
         tastatur = new Tastatur();
 
-        // ⚠️ WICHTIG: Tastatur aktivieren! ⚠️
+        // Tastatur einbringen
         Gdx.input.setInputProcessor(tastatur);
 
-        //Score
+        // Score anzeigen
         scoreFont = new BitmapFont();
         scoreFont.setColor(Color.WHITE);
         scoreFont.getData().setScale(2f);
@@ -78,14 +83,12 @@ public class GameScreen extends AbstractScreen {
         HealthbarFont.setColor(Color.RED);
         shapes = new com.badlogic.gdx.graphics.glutils.ShapeRenderer();
 
-        // Load heart textures
+        // Laedt die Texturen
         heartFull = new Texture("heart_full.png");
         heartEmpty = new Texture("heart_empty.png");
-
-        gameBackground = new Texture("gameBackground.png");
         player = new Player("player.png", 70, 105, tastatur);
 
-        // ========== LEVEL LADEN ==========
+        // Level laden
         loadLevel(1);  // Starte mit Level 1
 
         // Für das die Skalierung
@@ -98,19 +101,23 @@ public class GameScreen extends AbstractScreen {
         cameraScore = new OrthographicCamera();
         cameraScore.setToOrtho(false, 800, 600);
         MusicManager.getInstance().playGameMusic();
+
+        // Die Aufgabe auf dem Screen
+        startQuest = new BitmapFont();
+        startQuest.getData().setScale(2f);
     }
 
-    /**
-     * LEVEL LADEN
-     */
+    // Level laden
     private void loadLevel(int levelNumber) {
-        // Erstelle das passende Level-Objekt
-        if (levelNumber == 1) {
+
+        // Entscheiden, welches Spiel
+         if (levelNumber == 1) {
             currentLevel = new Level1();
+            gameBackground = new Texture("gameBackground.png");
         } else if (levelNumber == 2) {
             currentLevel = new Level2();
+            gameBackground = new Texture("gameBackground2.png");
         } else {
-            // Alle Levels durchgespielt!
             main.setScreen(new VictoryScreen(main));
             return;
         }
@@ -131,30 +138,42 @@ public class GameScreen extends AbstractScreen {
         player.setX(70);
         player.setY(105);
 
-        System.out.println("Level " + levelNumber + " geladen! Benötigte Münzen: " + currentLevel.getRequiredCoins());
+        player.setVelocityY(0);
+        player.setIsGrounded(true);
+
+        System.out.println("Level " + levelNumber + " geladen! Benoetigte Muenzen: " + currentLevel.getRequiredCoins());
     }
 
+    // Rendert alles im Bild
     @Override
     public void render(float delta) {
 
+        // Haben wir zum Debuggen benutzt
+    //    if(Gdx.input.isKeyJustPressed(Input.Keys.D)) {
+     //       loadLevel(currentLevelNumber + 1);
+   //     }
+
+        // Spieler wird bewegt
         player.Update(delta);
 
         if (iFrames > 0f) {
             iFrames -= delta;
         }
 
-        // UPDATE PLAYER RECTANGLE MIT AKTUELLER GRÖSSE!
+        // Gibt dem Spieler die geeigete Hitbox, welche sich aktualisiert
         playerRectangle.x = player.getX();
         playerRectangle.y = player.getY();
-        playerRectangle.width = 65;   // Player width ist immer 65
-        playerRectangle.height = 65;  // Basis height
+        playerRectangle.width = 65;
+        playerRectangle.height = 65;
 
+        // Kamera verfolgt spieler
         camera.position.x = player.getX();
         camera.update();
         batch.setProjectionMatrix(camera.combined);
 
         ScreenUtils.clear(0, 0, 0, 1);
 
+        // Zeichnen beginnt
         batch.begin();
 
         // Brauchen wir alles für die Skalierung
@@ -176,11 +195,15 @@ public class GameScreen extends AbstractScreen {
             batch.draw(gameBackground, (i * newWidth), 0, newWidth, newHeight);
         }
 
+        startQuest.draw(batch, "Sammle alle Münzen um zu Gewinnen", -100, 450);
+
         player.render(batch);
 
-        // ========== ENEMY KOLLISION ==========
+        // Gegner Hitbox und Kollision
         Rectangle enemyRectangle = new Rectangle(0, 0, 95, 108);
 
+        // Eine For Schleife, welche durch jeden Gegner aus der Liste abfragt, ob er beruehrt wird und wie
+        // Hier wird die Kollision mit den Gegnern verarbeitet
         for (int i = 0; i < enemies.size(); i++) {
             Enemy enemy = enemies.get(i);
             enemy.update(delta);
@@ -189,13 +212,14 @@ public class GameScreen extends AbstractScreen {
             enemyRectangle.x = enemy.getX();
             enemyRectangle.y = enemy.getY();
 
+            // Wenn der Spieler auf den Gegner springt
             if (playerRectangle.overlaps(enemyRectangle) && player.getY() > (enemy.getY() + enemyRectangle.height * 0.9)) {
                 enemies.remove(enemy);
                 player.setVelocityY(-8f);
-                player.setIsJumping(true);
                 continue;
             }
 
+            // Wenn der Spieler schaden bekommt
             if (playerRectangle.overlaps(enemyRectangle)
                 && player.getY() < (enemy.getY() + enemyRectangle.height * 0.9)) {
 
@@ -204,7 +228,6 @@ public class GameScreen extends AbstractScreen {
                     iFrames = 2.0f;
 
                     player.setVelocityY(-8f);
-                    player.setIsJumping(true);
 
                 }
 
@@ -216,7 +239,7 @@ public class GameScreen extends AbstractScreen {
 
         }
 
-        // ========== ITEM KOLLISION ==========
+        // Dasselbe uer Items
         Rectangle itemRectangle = new Rectangle(0, 0, 70, 70);
 
         for (int i = 0; i < items.size(); i++) {
@@ -225,12 +248,13 @@ public class GameScreen extends AbstractScreen {
             itemRectangle.x = item.getX();
             itemRectangle.y = item.getY();
 
+            // Wenn mann eine Muenze sammelt
             if (playerRectangle.overlaps(itemRectangle)) {
                 items.remove(item);
                 score++;
                 coinsCollectedInLevel++;
 
-                // ========== LEVEL ABSCHLUSS CHECK ==========
+                // Ist das Ziel erreicht?
                 if (coinsCollectedInLevel >= currentLevel.getRequiredCoins()) {
                     System.out.println("Level " + currentLevelNumber + " abgeschlossen!");
                     loadLevel(currentLevelNumber + 1);
@@ -238,8 +262,8 @@ public class GameScreen extends AbstractScreen {
             }
         }
 
-        // ========== BLOCK KOLLISION (FINAL FIX) ==========
-        Rectangle blockRectangle = new Rectangle(0, 0, 60, 60);
+        // Und auch bei Bleocken das geliche verfahren
+        Rectangle blockRectangle = new Rectangle(0, 0, 40, 60);
 
         for (int i = 0; i < blocks.size(); i++) {
             Block block = blocks.get(i);
@@ -261,23 +285,24 @@ public class GameScreen extends AbstractScreen {
 
                 // Reagiere basierend auf der kleinsten Überlappung
                 if (minOverlap == overlapBottom && player.getVelocityY() >= 0) {
-                    // VON OBEN auf Block landen (nur wenn fallend!)
+
+                    // Wenn man von oben drauf springt
                     player.setY(blockRectangle.y + blockRectangle.height);
                     player.setVelocityY(0f);
-                    player.setIsJumping(false);
                     player.setIsGrounded(true);
 
                 } else if (minOverlap == overlapTop && player.getVelocityY() < 0) {
-                    // VON UNTEN gegen Block (nur wenn springend!)
+
+                    // Wernn man unter den Block springt
                     player.setY(blockRectangle.y - playerRectangle.height);
                     player.setVelocityY(0.5f);
 
                 } else if (minOverlap == overlapLeft) {
-                    // VON LINKS gegen Block
+                    // Wenn man von Links springt
                     player.setX(blockRectangle.x - playerRectangle.width);
 
                 } else if (minOverlap == overlapRight) {
-                    // VON RECHTS gegen Block
+                    // Wenn man von Rechts springt
                     player.setX(blockRectangle.x + blockRectangle.width);
                 }
 
@@ -293,12 +318,12 @@ public class GameScreen extends AbstractScreen {
         batch.setProjectionMatrix(cameraScore.combined);
         batch.begin();
 
-        scoreFont.draw(batch, "SCORE: " + score, 18, 580);
+        scoreFont.draw(batch, "SCORE: " + score, 17, 580);
         scoreFont.draw(batch, "LEVEL: " + currentLevelNumber, 18, 550);
 
-        // Draw hearts
+        // Zeichnet Herzen
         float heartX = 20;
-        float heartY = 490;  // Etwas tiefer wegen Level-Anzeige
+        float heartY = 490;
         float heartSize = 32;
         float heartSpacing = 40;
 
@@ -318,11 +343,13 @@ public class GameScreen extends AbstractScreen {
         }
     }
 
+    // Skalierung
     @Override
     public void resize(int width, int height) {
         viewport.update(width, height, true);
     }
 
+    // Loescht alles am Ende
     @Override
     public void dispose() {
         batch.dispose();

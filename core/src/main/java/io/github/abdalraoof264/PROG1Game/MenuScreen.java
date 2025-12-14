@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
+// MenuScreen erbt von AbstractScreen
 public class MenuScreen extends AbstractScreen {
     private SpriteBatch batch;
     private Main main;
@@ -21,10 +22,13 @@ public class MenuScreen extends AbstractScreen {
     private OrthographicCamera camera;
     private Viewport viewport;
 
+
+    //Konstruktor
     public MenuScreen(Main main) {
         this.main = main;
     }
 
+    // Zeigt alles auf dem Screen
     @Override
     public void show() {
         batch = new SpriteBatch();
@@ -38,11 +42,13 @@ public class MenuScreen extends AbstractScreen {
         MusicManager.getInstance().playMenuMusic();
     }
 
+    // Skaliert alles
     @Override
     public void resize(int width, int height){
         viewport.update(width, height, true);
     }
 
+    // Rendert alles was gezeigt wird
     @Override
     public void render(float v) {
 
@@ -89,6 +95,7 @@ public class MenuScreen extends AbstractScreen {
     public void pause(){
     }
 
+    // Loescht alles was wir nicht brauchen
     @Override
     public void dispose() {
         batch.dispose();

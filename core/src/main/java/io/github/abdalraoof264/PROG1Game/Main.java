@@ -9,21 +9,21 @@ import com.badlogic.gdx.utils.ScreenUtils;
 /**
  * {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms.
  */
-public class Main extends Game {
-    private GameScreen gameScreen;
-    private MenuScreen menuScreen;
-    private GameOverScreen gameOverScreen;
 
+// Unsere Main Klasse
+public class Main extends Game {
+
+    // Setzt den Anfangsscreen
     @Override
     public void create() {
         setScreen(new MenuScreen(this));
     }
+
+    // Loescht alles am ende
     @Override
     public void dispose() {
-        // Dispose MusicManager (Singleton wird nur einmal disposed)
         MusicManager.getInstance().dispose();
 
-        // Dispose current screen
         if (getScreen() != null) {
             getScreen().hide();
         }
